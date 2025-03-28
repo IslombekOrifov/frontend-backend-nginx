@@ -1,0 +1,37 @@
+server {
+    listen 80;
+    server_name 95.46.210.69;
+
+    # Main application
+    location / {
+        root /var/www/perfona/dist;
+        index index.html;
+        try_files $uri $uri/ /index.html;
+    }
+
+    # Admin application
+    location /admin {
+        alias /var/www/perfona-admin/dist;
+        index index.html;
+        try_files $uri $uri/ /index.html;
+    }
+
+    # Бэкенд API
+    location /api/ {
+        include proxy_params;
+        proxy_pass http://unix:/run/gunicorn.sock;
+    }
+
+    # Статика Django
+    location /api/static/ {
+        alias /home/root/perfona/backend/perfona/static/;
+    }
+
+    # Медиа Django
+    location /api/media/ {
+        alias /home/root/perfona/backend/perfona/media/;
+    }
+
+    # Disable directory listing
+    autoindex off;
+}
